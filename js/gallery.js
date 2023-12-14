@@ -66,12 +66,12 @@ const images = [
     },
 ];
 
-    const gallery = document.querySelector(".gallery");
+const gallery = document.querySelector(".gallery");
 
-    gallery.innerHTML = images.reduce(
-        (HTML, { original, preview, description }) =>
-            HTML +
-            `<li class="gallery-item">
+gallery.innerHTML = images.reduce(
+    (HTML, { original, preview, description }) =>
+        HTML +
+        `<li class="gallery-item">
                 <a class="gallery-link" href="${original}">
                     <img
                         class="gallery-image"
@@ -81,28 +81,34 @@ const images = [
                     />
                 </a>
             </li>`,
-        ""
-    );
-    
-    let isModalOpen = false;
-    let lightbox;
-   
+    ""
+);
+
+
+let lightbox;
+
 gallery.addEventListener("click", (event) => {
     event.preventDefault();
     const clickedImage = event.target.closest(".gallery-image");
     if (clickedImage) {
         lightbox = basicLightbox.create(
-            `<img src="${clickedImage.dataset.source}" alt="${clickedImage.alt}" />`
+            `<img src="${clickedImage.dataset.source}" alt="${clickedImage.alt}" />`,
+            {
+                onShow: () => {
+                    document.addEventListener("keydown", onEscKeyPress);
+                },
+                onClose: () => {
+                    document.removeEventListener("keydown", onEscKeyPress);
+                },
+            }
         );
-        
+
         lightbox.show();
-        isModalOpen = true;
     }
 });
 
-document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && isModalOpen) {
+function onEscKeyPress(event) {
+    if (event.key === "Escape") {
         lightbox.close();
-        isModalOpen = false;
     }
-});
+}
